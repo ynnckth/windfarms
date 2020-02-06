@@ -1,6 +1,6 @@
 
 export interface WindfarmTelemetry {
   windfarmId: string;
-  temperature: number;
-  speed: number;
+  avgTemperature: number;
+  avgSpeed: number;
 }

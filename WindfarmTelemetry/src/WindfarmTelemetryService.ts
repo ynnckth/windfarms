@@ -17,8 +17,8 @@ class WindfarmTelemetryService {
   private collectWindfarmTelemetry(): WindfarmTelemetry {
     return {
       windfarmId: config.windfarm.id,
-      speed: faker.random.number({'min': config.minSpeed, 'max': config.maxSpeed}),
-      temperature: faker.random.number({'min': config.minTemperature, 'max': config.maxTemperature}),
+      avgSpeed: faker.random.number({'min': config.minSpeed, 'max': config.maxSpeed}),
+      avgTemperature: faker.random.number({'min': config.minTemperature, 'max': config.maxTemperature}),
     }
   }
 }
