@@ -1,8 +1,15 @@
 # Windfarm
 
-TODO: 
+**Microservices playground based on a wind farm example**
 
-- get and display data in dashboard
-- infrastructure in terraform for azure
-- ci/cd with azure devops
-- second variant with static hosting of client
+Start all services:
+> `$ docker-compose up`
+
+### Development
+
+Install all three projects:
+- WindfarmDashboard
+- WindfarmInventory
+- WindfarmTelemetry
+
+Check each project's README for how to proceed.
