@@ -1,0 +1,17 @@
+.header-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-spacer {
+    width: 100px;
+}
+
+.content {
+    margin-left: 25px;
+    margin-right: 25px;
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-evenly;
+}

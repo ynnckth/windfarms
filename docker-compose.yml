@@ -1,0 +1,24 @@
+version: '3'
+services:
+  dashboard:
+    build: WindfarmDashboard/
+    ports:
+      - "5001:5001"
+    environment:
+      - WINDFARM_ID=windfarm-001-11e9-8bad-9b1deb4d3b7d
+      - INVENTORY_URL=http://localhost:5002
+      - TELEMETRY_URL=http://localhost:5000
+    depends_on:
+      - telemetry
+
+  inventory:
+    build: WindfarmInventory/
+    ports:
+      - "5002:5002"
+
+  telemetry:
+    build: WindfarmTelemetry/
+    ports:
+      - "5000:5000"
+    environment:
+      - WINDFARM_ID=windfarm-001-11e9-8bad-9b1deb4d3b7d

@@ -2,17 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import {Socket} from 'socket.io';
 import * as http from 'http';
-import {getWindfarmDetails} from './WindfarmController';
 import WindfarmTelemetryService from './WindfarmTelemetryService';
 import {config} from './Config';
 
 
 const app = express();
 
-// TODO: add frontend client domain
-app.use(cors({origin: 'http://localhost:3000'}));
+// TODO: limit cors access
+app.use(cors({origin: '*'}));
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -21,18 +20,21 @@ app.use((req, res, next) => {
 
 app.set('port', process.env.PORT || 5000);
 
-app.get('/', (req, res) => res.json({message: 'check windfarm details at /api/details'}));
-app.get('/api/details', getWindfarmDetails);
-
-
 export const server = http.createServer(app);
-const io = require("socket.io")(server, {origins: 'http://localhost:3000'});  // TODO: add frontend client domain
+const io = require("socket.io")(server);  // TODO: restrict origins
 const windfarmTelemetryService = new WindfarmTelemetryService(io);
-
+let clients: Socket[] = [];
 
 io.on('connection', (socket: Socket) => {
-  console.log('Client connected to telemetry stream', socket.client.id);
+  clients.push(socket);
+  console.log('Connected client: ', socket.id);
   setInterval(() => windfarmTelemetryService.sendWindfarmTelemetry(), config.telemetryInterval);
-});
 
+  // TODO: fix clear connected clients
+  socket.on('disconnect', () => {
+    socket.disconnect(true);
+    clients = clients.filter(client => client.id !== socket.id);
+    console.log('Disconnected client ', socket.id);
+  });
+});
 export default app;

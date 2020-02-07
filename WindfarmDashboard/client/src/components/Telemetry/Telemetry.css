@@ -1,0 +1,10 @@
+.telemetry {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    max-width: 450px;
+}
+
+.avg-temperature-chart {
+    max-width: 450px;
+}

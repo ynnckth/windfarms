@@ -1,0 +1,22 @@
+{
+  "name": "windfarminventory",
+  "version": "1.0.0",
+  "description": "**Service providing inventory details of all managed windfarms**",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/Server.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.2",
+    "@types/node": "^13.7.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

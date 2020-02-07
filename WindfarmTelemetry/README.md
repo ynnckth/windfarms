@@ -6,4 +6,12 @@ Install:
 > `$ npm install`
 
 Run: 
-> `$ npm start`
+> `$ WINDFARM_ID=... npm start`
+> => http://localhost:5000
+
+Docker build:
+> `$ docker build -t windfarm-telemetry .`
+
+Docker run:
+> `$ docker run -p 5000:5000 -e WINDFARM_ID=... windfarm-telemetry`
+> => http://localhost:5000
