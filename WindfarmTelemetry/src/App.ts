@@ -25,12 +25,12 @@ const io = require("socket.io")(server);  // TODO: restrict origins
 const windfarmTelemetryService = new WindfarmTelemetryService(io);
 let clients: Socket[] = [];
 
+setInterval(() => windfarmTelemetryService.sendWindfarmTelemetry(), config.telemetryInterval);
+
 io.on('connection', (socket: Socket) => {
   clients.push(socket);
   console.log('Connected client: ', socket.id);
-  setInterval(() => windfarmTelemetryService.sendWindfarmTelemetry(), config.telemetryInterval);
 
-  // TODO: fix clear connected clients
   socket.on('disconnect', () => {
     socket.disconnect(true);
     clients = clients.filter(client => client.id !== socket.id);
