@@ -19,7 +19,7 @@ locals {
 }
 
 data "azurerm_container_registry" "azure-container-registry" {
-  name = "winfarmacr"
+  name = "windfarmacr"
   resource_group_name = "WINDFARM_GENERAL"
 }
 
@@ -144,9 +144,37 @@ resource "azurerm_app_service" "dashboard" {
   }
 }
 
-resource "azurerm_application_insights" "app_insights" {
-  name = "${local.stagedname}-app-insights"
-  location = azurerm_resource_group.rg.location
+resource "azurerm_storage_account" "storage_account" {
+  name = "windfarmstorage"
   resource_group_name = azurerm_resource_group.rg.name
-  application_type = "Web"
+  location = azurerm_resource_group.rg.location
+  account_tier = "Standard"
+  account_kind = "StorageV2"
+  account_replication_type = "LRS"
+  enable_https_traffic_only = true
+
+  # TODO: setup static website hosting for storage account including storage container
+//  provisioner "local-exec" {
+//    command = "az storage blob service-properties update --account-name ${azurerm_storage_account.storage_account.name} --static-website  --index-document index.html --404-document 404.html"
+//  }
 }
+
+resource "azurerm_cdn_profile" "cdn_profile" {
+  name                = "${local.stagedname}-cdn-profile"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Standard_Microsoft"
+}
+
+# TODO: add and setup CDN endpoint to point to the contents of the blob storage
+//resource "azurerm_cdn_endpoint" "cdn_endpoint" {
+//  name                = "${local.stagedname}-cdn-endpoint"
+//  profile_name        = azurerm_cdn_profile.cdn_profile.name
+//  location            = azurerm_resource_group.rg.location
+//  resource_group_name = azurerm_resource_group.rg.name
+//
+//  origin {
+//    name      = "windframStorageEndpoint"
+//    host_name = "windfarmstorage.blob.core.windows.net"
+//  }
+//}

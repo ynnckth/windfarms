@@ -19,7 +19,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_container_registry" "azure-container-registry" {
-  name = "winfarmacr"
+  name = "windfarmacr"
   resource_group_name = azurerm_resource_group.rg.name
   location = azurerm_resource_group.rg.location
   sku = "Standard"
