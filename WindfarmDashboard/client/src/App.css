@@ -15,3 +15,7 @@
     display: flex;
     justify-content: space-evenly;
 }
+
+.windfarm-details {
+    margin: 10px 20px 30px;
+}

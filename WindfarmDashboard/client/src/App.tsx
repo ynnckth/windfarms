@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {AppBar, Toolbar, Typography} from '@material-ui/core';
+import {AppBar, Paper, Toolbar, Typography} from '@material-ui/core';
 import WindfarmInventoryService from './services/WindfarmInventoryService';
 import {Windfarm} from './types/Windfarm';
 import Telemetry from './components/Telemetry/Telemetry';
@@ -45,20 +45,22 @@ const App: React.FC<IProps> = (props: IProps) => {
       <div className="content">
         <div>
           {windfarm &&
-          <React.Fragment>
-            <Typography variant="h6" component="h6">{windfarm?.name}</Typography>
-            <ul>
-              <li>Id: {windfarm.id}</li>
-              <li>Number of turbines: {windfarm.numberOfTurbines}</li>
-              <li>Commissioning date: {windfarm.commissioningDate}</li>
-            </ul>
-          </React.Fragment>}
+          <Paper variant="outlined">
+            <div className="windfarm-details">
+              <Typography variant="h6" component="h6">Windfarm details</Typography>
+              <ul>
+                <li>Id: {windfarm.id}</li>
+                <li>Number of turbines: {windfarm.numberOfTurbines}</li>
+                <li>Commissioning date: {windfarm.commissioningDate}</li>
+              </ul>
+            </div>
+          </Paper>}
         </div>
         <TelemetryServiceContext.Consumer>
           {telemetryService => <Telemetry telemetryService={telemetryService}/>}
         </TelemetryServiceContext.Consumer>
       </div>
-    {/* TODO: idea: add world map with highlighted wind farm location: https://jsfiddle.net/BlackLabel/gt71a4xe/ */}
+      {/* TODO: idea: add world map with highlighted wind farm location: https://jsfiddle.net/BlackLabel/gt71a4xe/ */}
     </div>
   );
 };
