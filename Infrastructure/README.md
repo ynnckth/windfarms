@@ -1,5 +1,6 @@
 # Terraform Azure Infrastructure
 
+The Terraform state is managed in Terraform Cloud:
 https://app.terraform.io/
 
 Login with Azure CLI:
