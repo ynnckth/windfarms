@@ -22,3 +22,15 @@ services:
       - "5000:5000"
     environment:
       - WINDFARM_ID=windfarm-001-11e9-8bad-9b1deb4d3b7d
+      - MESSAGE_BROKER_CONNECTION_STRING=amqp://guest:guest@broker:5672
+    depends_on:
+      - broker
+
+  broker:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672" # RabbitMQ management UI
+      - "15675:15675" # MQTT over Websockets
+    volumes:
+      - ./MessageBroker/config/enabled_plugins:/etc/rabbitmq/enabled_plugins

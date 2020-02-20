@@ -9,7 +9,7 @@ import WindfarmInventoryService from './services/WindfarmInventoryService';
 
 const configurationService = new ConfigurationService();
 const inventoryService = new WindfarmInventoryService(configurationService);
-export const TelemetryServiceContext = React.createContext<WindfarmTelemetryService>(new WindfarmTelemetryService(configurationService));
+export const TelemetryServiceContext = React.createContext<WindfarmTelemetryService>(new WindfarmTelemetryService());
 
 ReactDOM.render(
   <App

@@ -7,17 +7,14 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
     "@testing-library/user-event": "^7.2.1",
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.26",
-    "@types/react": "^16.9.19",
-    "@types/react-dom": "^16.9.5",
     "highcharts": "^8.0.0",
     "highcharts-react-official": "^2.2.2",
+    "paho-mqtt": "^1.1.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-scripts": "3.3.1",
-    "socket.io-client": "^2.3.0",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "uuid": "^3.4.0"
   },
   "scripts": {
     "start": "REACT_APP_ENV=dev react-scripts start",
@@ -41,6 +38,11 @@
     ]
   },
   "devDependencies": {
-    "@types/socket.io-client": "^1.4.32"
+    "@types/jest": "^24.9.1",
+    "@types/node": "^12.12.26",
+    "@types/paho-mqtt": "^1.0.4",
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "@types/uuid": "^3.4.7"
   }
 }

@@ -5,6 +5,7 @@ import HighchartsReact from 'highcharts-react-official';
 import {speedChartConfig, temperatureChartConfig} from '../../ChartConfig';
 import {WindfarmTelemetry} from '../../types/WindfarmTelemetry';
 import WindfarmTelemetryService from '../../services/WindfarmTelemetryService';
+import {Subscription} from 'rxjs';
 
 
 interface IProps {
@@ -22,12 +23,36 @@ class Telemetry extends React.Component<IProps, IState> {
 
   private temperatureChartReference: HighchartsReact | null = null;
   private speedChartReference: HighchartsReact | null = null;
+  private telemetrySubscription: Subscription | undefined;
 
   constructor(props: IProps) {
     super(props);
     this.state = {
       telemetryData: [],
     };
+  }
+
+  async componentDidMount() {
+    const {telemetryService} = this.props;
+
+    await telemetryService.connect();
+    // TODO: make selectable from list
+    telemetryService.subscribeToWindfarmTelemetry('windfarm-001-11e9-8bad-9b1deb4d3b7d');
+    this.telemetrySubscription = telemetryService.onTelemetryMessage()
+      .subscribe((telemetryMessage: WindfarmTelemetry) => {
+        console.log('Received telemetry message: ', telemetryMessage);
+
+        let telemetryData = this.state.telemetryData.concat(telemetryMessage);
+        if (telemetryData.length > this.MAX_TELEMETRY_DATA_TO_KEEP) {
+          telemetryData = telemetryData.slice(telemetryData.length - this.MAX_TELEMETRY_DATA_TO_KEEP, telemetryData.length);
+        }
+        this.setState({telemetryData: telemetryData});
+        this.updateCharts();
+      });
+  }
+
+  componentWillUnmount(): void {
+    this.telemetrySubscription?.unsubscribe();
   }
 
   updateCharts = () => {
@@ -40,21 +65,6 @@ class Telemetry extends React.Component<IProps, IState> {
       speedChart.series[0].setData(this.state.telemetryData.map(telemetryPoint => telemetryPoint.avgSpeed), true, false);
     }
   };
-
-  async componentDidMount() {
-    const {telemetryService} = this.props;
-
-    await telemetryService.connect();
-    console.log('Subscribing to telemetry stream');
-    telemetryService.telemetryStream!.on('windfarm_telemetry', (telemetry: WindfarmTelemetry) => {
-        let telemetryData = this.state.telemetryData.concat(telemetry);
-        if (telemetryData.length > this.MAX_TELEMETRY_DATA_TO_KEEP) {
-          telemetryData = telemetryData.slice(telemetryData.length - this.MAX_TELEMETRY_DATA_TO_KEEP, telemetryData.length);
-        }
-        this.setState({telemetryData: telemetryData});
-        this.updateCharts();
-      });
-  }
 
   render() {
     return (
