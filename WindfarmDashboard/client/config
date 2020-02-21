@@ -1,1 +1,1 @@
-{"windfarmId":"windfarm-001-11e9-8bad-9b1deb4d3b7d","windfarmInventory":{"baseUrl":"https://windfarm-dev-inventory.azurewebsites.net"},"windfarmTelemetry":{"baseUrl":"https://windfarm-dev-telemetry.azurewebsites.net"}}
+{"windfarmId":"windfarm-001-11e9-8bad-9b1deb4d3b7d","windfarmInventory":{"baseUrl":"http://localhost:5002"},"windfarmTelemetry":{"baseUrl":"http://localhost:5000"},"messageBroker":{"host":"127.0.0.1","port":15675}}

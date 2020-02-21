@@ -8,6 +8,7 @@ services:
       - WINDFARM_ID=windfarm-001-11e9-8bad-9b1deb4d3b7d
       - INVENTORY_URL=http://localhost:5002
       - TELEMETRY_URL=http://localhost:5000
+      - MESSAGE_BROKER_HOST=127.0.0.1
     depends_on:
       - telemetry
 

@@ -2,29 +2,38 @@ import {Client, MQTTError, Message} from 'paho-mqtt';
 import uuid from 'uuid';
 import {Subject, Observable} from 'rxjs';
 import {WindfarmTelemetry} from '../types/WindfarmTelemetry';
+import ConfigurationService from './ConfigurationService';
 
 
 class WindfarmTelemetryService {
 
+  private readonly CONNECTION_KEEP_ALIVE_INTERVAL = 20000;
+  private readonly CLIENT_CONNECTION_ID: string;
+
   private client: Client | undefined;
   private readonly telemetry$: Subject<WindfarmTelemetry>;
 
-  constructor() {
+  constructor(private configurationService: ConfigurationService) {
+    this.CLIENT_CONNECTION_ID = uuid.v1().toString();
     this.telemetry$ = new Subject<WindfarmTelemetry>();
     this.handleMessageArrived = this.handleMessageArrived.bind(this);
     this.subscribeToWindfarmTelemetry = this.subscribeToWindfarmTelemetry.bind(this);
+    this.sendConnectionKeepAliveMessage = this.sendConnectionKeepAliveMessage.bind(this);
   }
 
   async connect(): Promise<void> {
-    // TODO: set environment specific broker URL
-    this.client = new Client('127.0.0.1', 15675, '/ws', uuid.v1().toString());
+    const config = await this.configurationService.getConfiguration();
+    this.client = new Client(config.messageBroker.host, config.messageBroker.port, '/ws', this.CLIENT_CONNECTION_ID);
     this.client.onMessageArrived = this.handleMessageArrived;
     this.client.onConnectionLost = (error: MQTTError) => console.log('Lost connection to message broker: ', JSON.stringify(error));
 
     this.client.connect({
-      keepAliveInterval: 1800 * 2, // TODO: fix overriding default of 60s without activity to 1h (probably on broker configuration side)
+      keepAliveInterval: 1800 * 2,
       onSuccess: () => {
         console.log('Connected to message broker');
+        setInterval(() => {
+          this.sendConnectionKeepAliveMessage();
+        }, this.CONNECTION_KEEP_ALIVE_INTERVAL)
       }
     });
   }
@@ -54,6 +63,13 @@ class WindfarmTelemetryService {
 
   private handleMessageArrived(message: Message): void {
     this.telemetry$.next(JSON.parse(message.payloadString) as WindfarmTelemetry);
+  }
+
+  private sendConnectionKeepAliveMessage(): void {
+    const pingMessage = new Message(`keep alive client connection ${this.CLIENT_CONNECTION_ID}`);
+    pingMessage.destinationName = 'keep_alive';
+    this.client?.send(pingMessage);
+    console.log('Sent connection keep alive message');
   }
 }
 export default WindfarmTelemetryService;
