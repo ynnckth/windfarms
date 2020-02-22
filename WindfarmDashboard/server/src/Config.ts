@@ -1,5 +1,4 @@
 export const config = {
-  windfarmId: process.env.WINDFARM_ID,
   windfarmInventory: {
     baseUrl: process.env.INVENTORY_URL,
   },

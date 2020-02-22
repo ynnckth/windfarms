@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './App.css';
-import {AppBar, Paper, Toolbar, Typography} from '@material-ui/core';
+import {AppBar, FormControl, InputLabel, MenuItem, Paper, Select, Toolbar, Typography} from '@material-ui/core';
 import WindfarmInventoryService from './services/WindfarmInventoryService';
 import {Windfarm} from './types/Windfarm';
 import Telemetry from './components/Telemetry/Telemetry';
@@ -16,19 +16,24 @@ interface IProps {
 const App: React.FC<IProps> = (props: IProps) => {
 
   const {inventoryService, configurationService} = props;
-  const [windfarm, setWindfarm] = useState<Windfarm | undefined>(undefined);
+  const [windfarms, setWindfarms] = useState<Windfarm[] | undefined>(undefined);
+  const [selectedWindfarm, setSelectedWindfarm] = useState<Windfarm | undefined>(undefined);
 
   useEffect(() => {
-    if (windfarm !== undefined) {
+    if (windfarms !== undefined) {
       return;
     }
-    const loadWindfarm = async () => {
+    const loadWindfarms = async () => {
       const config = await configurationService.getConfiguration();
-      const windfarm = await inventoryService.getWindfarm(config.windfarmId);
-      setWindfarm(windfarm);
+      const windfarms = await inventoryService.getWindfarms();
+      setWindfarms(windfarms);
     };
-    loadWindfarm();
-  }, [windfarm, configurationService, inventoryService]);
+    loadWindfarms();
+  }, [windfarms, configurationService, inventoryService]);
+
+  const onSelectedWindfarm = (w: any) => {
+    console.log('Selected windfarm ', w);
+  };
 
   return (
     <div>
@@ -36,7 +41,17 @@ const App: React.FC<IProps> = (props: IProps) => {
         <Toolbar>
           <div className="header-content">
             <div>Windfarm Dashboard</div>
-            {windfarm && <div>{windfarm.name}</div>}
+
+            {windfarms &&
+            <FormControl>
+              <InputLabel id="select-label">Windfarm</InputLabel>
+              <Select
+                labelId="select-label"
+                value={}
+                onChange={onSelectedWindfarm}>
+                {windfarms.map(w => <MenuItem value={w.id}>{w.name}</MenuItem>)}
+              </Select>
+            </FormControl>}
             <div className="header-spacer"/>
           </div>
         </Toolbar>
@@ -44,14 +59,14 @@ const App: React.FC<IProps> = (props: IProps) => {
 
       <div className="content">
         <div>
-          {windfarm &&
+          {selectedWindfarm &&
           <Paper variant="outlined">
             <div className="windfarm-details">
               <Typography variant="h6" component="h6">Windfarm details</Typography>
               <ul>
-                <li>Id: {windfarm.id}</li>
-                <li>Number of turbines: {windfarm.numberOfTurbines}</li>
-                <li>Commissioning date: {windfarm.commissioningDate}</li>
+                <li>Id: {selectedWindfarm.id}</li>
+                <li>Number of turbines: {selectedWindfarm.numberOfTurbines}</li>
+                <li>Commissioning date: {selectedWindfarm.commissioningDate}</li>
               </ul>
             </div>
           </Paper>}

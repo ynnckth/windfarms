@@ -1,5 +1,4 @@
 export interface Configuration {
-  windfarmId: string;
   windfarmInventory: WindfarmInventoryConfiguration;
   windfarmTelemetry: WindfarmTelemetryConfiguration;
   messageBroker: MessageBrokerConfiguration;
