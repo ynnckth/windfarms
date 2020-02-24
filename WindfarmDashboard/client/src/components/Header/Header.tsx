@@ -3,6 +3,7 @@ import './Header.css';
 import {FormControl, InputLabel, MenuItem, Select, Theme, WithStyles, withStyles} from '@material-ui/core';
 import {Windfarm} from '../../types/Windfarm';
 import StateService from '../../services/StateService';
+import logo from '../../assets/wind_mill_icon.png';
 
 
 interface IProps extends WithStyles {
@@ -58,7 +59,7 @@ const Header: React.FC<IProps> = (props: IProps) => {
           {windfarms.map(w => <MenuItem key={w.id} value={w.id}>{w.name}</MenuItem>)}
         </Select>
       </FormControl>}
-      <div className="header-spacer"/>
+      <img src={logo} className="logo" alt="Logo"/>
     </div>
   );
 };
