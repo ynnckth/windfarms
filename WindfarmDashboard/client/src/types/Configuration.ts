@@ -1,14 +1,9 @@
 export interface Configuration {
   windfarmInventory: WindfarmInventoryConfiguration;
-  windfarmTelemetry: WindfarmTelemetryConfiguration;
   messageBroker: MessageBrokerConfiguration;
 }
 
 export interface WindfarmInventoryConfiguration {
-  baseUrl: string;
-}
-
-export interface WindfarmTelemetryConfiguration {
   baseUrl: string;
 }
 

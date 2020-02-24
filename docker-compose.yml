@@ -6,7 +6,6 @@ services:
       - "5001:5001"
     environment:
       - INVENTORY_URL=http://localhost:5002
-      - TELEMETRY_URL=http://localhost:5000
       - MESSAGE_BROKER_HOST=127.0.0.1
     depends_on:
       - telemetry
