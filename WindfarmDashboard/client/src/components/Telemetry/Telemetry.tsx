@@ -6,10 +6,13 @@ import {speedChartConfig, temperatureChartConfig} from '../../ChartConfig';
 import {WindfarmTelemetry} from '../../types/WindfarmTelemetry';
 import WindfarmTelemetryService from '../../services/WindfarmTelemetryService';
 import {Subscription} from 'rxjs';
+import StateService from '../../services/StateService';
+import {Windfarm} from '../../types/Windfarm';
 
 
 interface IProps {
   telemetryService: WindfarmTelemetryService;
+  stateService: StateService;
 }
 
 interface IState {
@@ -24,6 +27,7 @@ class Telemetry extends React.Component<IProps, IState> {
   private temperatureChartReference: HighchartsReact | null = null;
   private speedChartReference: HighchartsReact | null = null;
   private telemetrySubscription: Subscription | undefined;
+  private stateServiceSubscription: Subscription | undefined;
 
   constructor(props: IProps) {
     super(props);
@@ -33,11 +37,15 @@ class Telemetry extends React.Component<IProps, IState> {
   }
 
   async componentDidMount() {
-    const {telemetryService} = this.props;
+    const {telemetryService, stateService} = this.props;
 
     await telemetryService.connect();
-    // TODO: make selectable from list
-    telemetryService.subscribeToWindfarmTelemetry('windfarm-001-11e9-8bad-9b1deb4d3b7d');
+    this.stateServiceSubscription = stateService.onSelectedWindfarm()
+      .subscribe((selectedWindfarm: Windfarm) => {
+        telemetryService.subscribe(selectedWindfarm.id);
+        this.setState({telemetryData: []}, () => this.updateCharts());
+      });
+
     this.telemetrySubscription = telemetryService.onTelemetryMessage()
       .subscribe((telemetryMessage: WindfarmTelemetry) => {
         console.log('Received telemetry message: ', telemetryMessage);
@@ -46,12 +54,12 @@ class Telemetry extends React.Component<IProps, IState> {
         if (telemetryData.length > this.MAX_TELEMETRY_DATA_TO_KEEP) {
           telemetryData = telemetryData.slice(telemetryData.length - this.MAX_TELEMETRY_DATA_TO_KEEP, telemetryData.length);
         }
-        this.setState({telemetryData: telemetryData});
-        this.updateCharts();
+        this.setState({telemetryData: telemetryData}, () => this.updateCharts());
       });
   }
 
   componentWillUnmount(): void {
+    this.stateServiceSubscription?.unsubscribe();
     this.telemetrySubscription?.unsubscribe();
   }
 
@@ -67,22 +75,27 @@ class Telemetry extends React.Component<IProps, IState> {
   };
 
   render() {
+    const {selectedWindfarm} = this.props.stateService;
+
     return (
       <div className="telemetry">
-        <div className="avg-temperature-chart">
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={temperatureChartConfig}
-            ref={element => this.temperatureChartReference = element}
-          />
-        </div>
-        <div className="avg-speed-chart">
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={speedChartConfig}
-            ref={element => this.speedChartReference = element}
-          />
-        </div>
+        {selectedWindfarm &&
+        <React.Fragment>
+          <div className="avg-temperature-chart">
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={temperatureChartConfig}
+              ref={element => this.temperatureChartReference = element}
+            />
+          </div>
+          <div className="avg-speed-chart">
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={speedChartConfig}
+              ref={element => this.speedChartReference = element}
+            />
+          </div>
+        </React.Fragment>}
       </div>
     );
   }

@@ -3,6 +3,7 @@ import uuid from 'uuid';
 import {Subject, Observable} from 'rxjs';
 import {WindfarmTelemetry} from '../types/WindfarmTelemetry';
 import ConfigurationService from './ConfigurationService';
+import StateService from './StateService';
 
 
 class WindfarmTelemetryService {
@@ -13,11 +14,12 @@ class WindfarmTelemetryService {
   private client: Client | undefined;
   private readonly telemetry$: Subject<WindfarmTelemetry>;
 
-  constructor(private configurationService: ConfigurationService) {
+  constructor(private configurationService: ConfigurationService, private stateService: StateService) {
     this.CLIENT_CONNECTION_ID = uuid.v1().toString();
     this.telemetry$ = new Subject<WindfarmTelemetry>();
+
     this.handleMessageArrived = this.handleMessageArrived.bind(this);
-    this.subscribeToWindfarmTelemetry = this.subscribeToWindfarmTelemetry.bind(this);
+    this.subscribe = this.subscribe.bind(this);
     this.sendConnectionKeepAliveMessage = this.sendConnectionKeepAliveMessage.bind(this);
   }
 
@@ -38,23 +40,21 @@ class WindfarmTelemetryService {
     });
   }
 
-  subscribeToWindfarmTelemetry(windfarmId: string): void {
+  subscribe(windfarmId: string): void {
     if (!this.client) {
-      console.log('Error, cannot subscribe since client is undefined');
+      console.log('Cannot subscribe to windfarm telemetry because client is undefined');
       return;
     }
     if (!this.client.isConnected()) {
-      console.log('Cannot subscribe while client is not connected');
-      // TODO: return or throw error
+      console.log('Cannot subscribe to windfarm telemetry while client is not connected');
+      return;
     }
-
-    // TODO: remove timeout and provide fallback (retry)
-    setTimeout(() => {
-      if (this.client?.isConnected()) {
-        this.client?.subscribe(`${windfarmId}/telemetry`);
-        console.log('Subscribed to telemetry of windfarm ', windfarmId);
-      }
-    }, 3000);
+    if (this.stateService.selectedWindfarm?.id) {
+      this.client?.unsubscribe(`${this.stateService.selectedWindfarm.id}/telemetry`);
+      console.log('Unsubscribed telemetry of windfarm ', this.stateService.selectedWindfarm.id);
+    }
+    this.client?.subscribe(`${windfarmId}/telemetry`);
+    console.log('Subscribed to telemetry of windfarm ', windfarmId);
   }
 
   onTelemetryMessage(): Observable<WindfarmTelemetry> {

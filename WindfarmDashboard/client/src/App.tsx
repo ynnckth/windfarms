@@ -1,83 +1,97 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import './App.css';
-import {AppBar, FormControl, InputLabel, MenuItem, Paper, Select, Toolbar, Typography} from '@material-ui/core';
+import {
+  AppBar,
+  Paper,
+  Toolbar,
+  Typography
+} from '@material-ui/core';
 import WindfarmInventoryService from './services/WindfarmInventoryService';
 import {Windfarm} from './types/Windfarm';
 import Telemetry from './components/Telemetry/Telemetry';
+import Header from './components/Header/Header';
 import {TelemetryServiceContext} from './index';
 import ConfigurationService from './services/ConfigurationService';
+import StateService from './services/StateService';
+import {Subscription} from 'rxjs';
 
 
 interface IProps {
   configurationService: ConfigurationService;
   inventoryService: WindfarmInventoryService;
+  stateService: StateService;
 }
 
-const App: React.FC<IProps> = (props: IProps) => {
+interface IState {
+  windfarms: Windfarm[];
+  selectedWindfarm?: Windfarm;
+}
 
-  const {inventoryService, configurationService} = props;
-  const [windfarms, setWindfarms] = useState<Windfarm[] | undefined>(undefined);
-  const [selectedWindfarm, setSelectedWindfarm] = useState<Windfarm | undefined>(undefined);
+class App extends React.Component<IProps, IState> {
+  public state: IState;
+  private selectedWindfarmSubscription?: Subscription;
 
-  useEffect(() => {
-    if (windfarms !== undefined) {
-      return;
-    }
-    const loadWindfarms = async () => {
-      const config = await configurationService.getConfiguration();
-      const windfarms = await inventoryService.getWindfarms();
-      setWindfarms(windfarms);
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      windfarms: [],
+      selectedWindfarm: undefined,
     };
-    loadWindfarms();
-  }, [windfarms, configurationService, inventoryService]);
+  }
 
-  const onSelectedWindfarm = (w: any) => {
-    console.log('Selected windfarm ', w);
-  };
+  async componentDidMount(): Promise<void> {
+    // TODO: refactor => check if can be replaced with deep watch of this.props.stateService.windfarm
+    this.selectedWindfarmSubscription = this.props.stateService.onSelectedWindfarm()
+      .subscribe((selectedWindfarm: Windfarm) => this.setState({selectedWindfarm: selectedWindfarm}));
+    try {
+      const windfarms = await this.props.inventoryService.getWindfarms();
+      this.setState({windfarms: windfarms});
+    } catch (e) {
+      console.log('Error loading windfarms: ', e);
+    }
+  }
 
-  return (
-    <div>
-      <AppBar position="relative">
-        <Toolbar>
-          <div className="header-content">
-            <div>Windfarm Dashboard</div>
+  componentWillUnmount(): void {
+    this.selectedWindfarmSubscription?.unsubscribe();
+  }
 
-            {windfarms &&
-            <FormControl>
-              <InputLabel id="select-label">Windfarm</InputLabel>
-              <Select
-                labelId="select-label"
-                value={}
-                onChange={onSelectedWindfarm}>
-                {windfarms.map(w => <MenuItem value={w.id}>{w.name}</MenuItem>)}
-              </Select>
-            </FormControl>}
-            <div className="header-spacer"/>
-          </div>
-        </Toolbar>
-      </AppBar>
+  render() {
+    const {windfarms, selectedWindfarm} = this.state;
 
-      <div className="content">
-        <div>
+    return (
+      <div>
+        <AppBar position="relative">
+          <Toolbar>
+            <Header stateService={this.props.stateService} windfarms={windfarms}/>
+          </Toolbar>
+        </AppBar>
+
+        <div className="content">
           {selectedWindfarm &&
-          <Paper variant="outlined">
-            <div className="windfarm-details">
-              <Typography variant="h6" component="h6">Windfarm details</Typography>
-              <ul>
-                <li>Id: {selectedWindfarm.id}</li>
-                <li>Number of turbines: {selectedWindfarm.numberOfTurbines}</li>
-                <li>Commissioning date: {selectedWindfarm.commissioningDate}</li>
-              </ul>
-            </div>
-          </Paper>}
+          <div>
+            <Paper variant="outlined">
+              <div className="windfarm-details">
+                <Typography variant="h6" component="h6">Windfarm details</Typography>
+                <ul>
+                  <li>Id: {selectedWindfarm.id}</li>
+                  <li>Number of turbines: {selectedWindfarm.numberOfTurbines}</li>
+                  <li>Commissioning date: {selectedWindfarm.commissioningDate}</li>
+                </ul>
+              </div>
+            </Paper>
+          </div>}
+          <TelemetryServiceContext.Consumer>
+            {telemetryService =>
+              <Telemetry
+                telemetryService={telemetryService}
+                stateService={this.props.stateService}
+              />}
+          </TelemetryServiceContext.Consumer>
         </div>
-        <TelemetryServiceContext.Consumer>
-          {telemetryService => <Telemetry telemetryService={telemetryService}/>}
-        </TelemetryServiceContext.Consumer>
+        {/* TODO: idea: add world map with highlighted wind farm location: https://jsfiddle.net/BlackLabel/gt71a4xe/ */}
       </div>
-      {/* TODO: idea: add world map with highlighted wind farm location: https://jsfiddle.net/BlackLabel/gt71a4xe/ */}
-    </div>
-  );
-};
+    );
+  }
+}
 
 export default App;
