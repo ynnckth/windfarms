@@ -1,4 +1,4 @@
-# Windfarm
+# Windfarms
 
 *Microservices playground based on a wind farm example*
 
@@ -52,7 +52,7 @@ $ docker push $WINDFARM_ACR_URL/windfarm/dashboard:latest
 Enable static website hosting on the storage account.
 This will create a storage container called *$web*.
 
-Upload your static frontend files (output of build task) into the storage container and access it through the configured endpoint of the storage account.
+Upload your static frontend files (output of build task and a config file) into the storage container and access it through the configured endpoint of the storage account.
 
 ```
 $ cd WindfarmDashboard/client
