@@ -37,6 +37,12 @@ $ docker build -t $WINDFARM_ACR_URL/windfarm/dashboard:latest WindfarmDashboard
 # Push to container registry:
 $ docker push $WINDFARM_ACR_URL/windfarm/<dashboard | inventory | telemetry>:latest
 
+# Tag and push RabbitMQ broker
+$ docker tag rabbitmq:3-management $WINDFARM_ACR_URL/windfarm/broker:latest
+$ docker push $WINDFARM_ACR_URL/windfarm/broker:latest 
+
+
+
 # Example: 
 $ docker push $WINDFARM_ACR_URL/windfarm/dashboard:latest
 ```
@@ -52,13 +58,4 @@ Upload your static frontend files (output of build task) into the storage contai
 $ cd WindfarmDashboard/client
 
 $ npm run build
-
-
 ```
-
-Pricing: https://azure.microsoft.com/en-us/pricing/details/storage/blobs/
-
-### CDN
-tbd
-
-Pricing: https://azure.microsoft.com/en-us/pricing/details/cdn/

@@ -10,7 +10,7 @@ Management UI:
 > http://localhost:15672/#/
 
 Default credentials: guest/guest
-
+Read [this](https://onlinehelp.coveo.com/en/ces/7.0/administrator/changing_the_rabbitmq_administrator_password.htm) for how to change the default password.
 
 To test pub/sub go to broker management UI and check for an exchange called `amq.topic`.
 From there you can publish messages using the routing key: `<windfarm id>.telemetry` which gets translated into a topic `<windfarm id>/telemetry`.

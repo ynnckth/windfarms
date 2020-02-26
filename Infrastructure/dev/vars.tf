@@ -13,3 +13,17 @@ variable "default_tags" {
     autodeploy  = true
   }
 }
+
+variable broker_vm {
+  default = {
+    credentials = {
+      username = null
+      password = null
+    }
+
+    rabbitmq = {
+      username = null
+      password = null
+    }
+  }
+}

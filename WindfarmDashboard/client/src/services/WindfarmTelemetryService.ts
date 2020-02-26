@@ -1,4 +1,4 @@
-import {Client, MQTTError, Message} from 'paho-mqtt';
+import {Client, MQTTError, Message, ErrorWithInvocationContext} from 'paho-mqtt';
 import uuid from 'uuid';
 import {Subject, Observable} from 'rxjs';
 import {WindfarmTelemetry} from '../types/WindfarmTelemetry';
@@ -31,11 +31,16 @@ class WindfarmTelemetryService {
 
     this.client.connect({
       keepAliveInterval: 1800 * 2,
+      userName: config.messageBroker.userName,
+      password: config.messageBroker.password,
       onSuccess: () => {
         console.log('Connected to message broker');
         setInterval(() => {
           this.sendConnectionKeepAliveMessage();
         }, this.CONNECTION_KEEP_ALIVE_INTERVAL)
+      },
+      onFailure: (error: ErrorWithInvocationContext) => {
+        console.log('Failed to connect to message broker: ', error);
       }
     });
   }

@@ -13,5 +13,5 @@ Docker build:
 > `$ docker build -t windfarm-telemetry .`
 
 Docker run:
-> `$ docker run -p 5000:5000 -e WINDFARM_ID=... windfarm-telemetry`
+> `$ docker run -p 5000:5000 -e WINDFARM_ID=... -e MESSAGE_BROKER_CONNECTION_STRING="" windfarm-telemetry`
 > => http://localhost:5000

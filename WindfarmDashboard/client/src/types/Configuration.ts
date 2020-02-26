@@ -10,4 +10,6 @@ export interface WindfarmInventoryConfiguration {
 export interface MessageBrokerConfiguration {
   host: string;
   port: number;
+  userName: string;
+  password: string;
 }

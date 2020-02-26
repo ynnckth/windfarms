@@ -7,6 +7,8 @@ services:
     environment:
       - INVENTORY_URL=http://localhost:5002
       - MESSAGE_BROKER_HOST=127.0.0.1
+      - MESSAGE_BROKER_USERNAME=guest
+      - MESSAGE_BROKER_PASSWORD=guest
     depends_on:
       - telemetry
 
